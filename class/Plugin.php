@@ -6,6 +6,7 @@ namespace Woof;
 use Woof\Models\Database;
 use Woof\Routing\Route;
 
+
 class Plugin
 {
 
