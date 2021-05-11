@@ -2,6 +2,7 @@
 require __DIR__ .'/static-vendor/autoload.php';
 require __DIR__ .'/../woof-model/autoload.php';
 require __DIR__ .'/../woof-theme/autoload.php';
+require __DIR__ .'/../woof-view/autoload.php';
 
 
 require_once(ABSPATH.'wp-admin/includes/user.php');
