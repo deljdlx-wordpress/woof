@@ -3,7 +3,7 @@
 
 namespace Woof;
 
-use Woof\Models\Database;
+use Woof\Model\ORM\Database;
 use Woof\Routing\Route;
 
 
