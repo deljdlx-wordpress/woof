@@ -1,8 +1,14 @@
 <?php
 require __DIR__ .'/static-vendor/autoload.php';
-require __DIR__ .'/woof-package/woof-model/autoload.php';
-require __DIR__ .'/woof-package/woof-theme/autoload.php';
-require __DIR__ .'/woof-package/woof-view/autoload.php';
+
+
+require __DIR__ .'/woof-package/phi/phi-filesystem/source/autoload.php';
+require __DIR__ .'/woof-package/phi/phi-traits/source/autoload.php';
+
+
+require __DIR__ .'/woof-package/woof/woof-model/autoload.php';
+require __DIR__ .'/woof-package/woof/woof-theme/autoload.php';
+require __DIR__ .'/woof-package/woof/woof-view/autoload.php';
 
 
 require_once(ABSPATH.'wp-admin/includes/user.php');
