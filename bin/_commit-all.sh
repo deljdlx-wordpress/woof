@@ -19,8 +19,9 @@ git add . && git commit -m "auto sync" && git push
 cd ..
 echo "------------------------------"
 
-cd ../../bin
 
+# ======================================================================
+cd ../../bin
 # ======================================================================
 cd ../woof-package/phi
 
@@ -36,8 +37,21 @@ git add . && git commit -m "auto sync" && git push
 cd ..
 echo "------------------------------"
 
-cd ../../bin
+echo "Commiting phi-html"
+cd phi-traits
+git add . && git commit -m "auto sync" && git push
+cd ..
+echo "------------------------------"
 
+echo "Commiting phi-container"
+cd phi-traits
+git add . && git commit -m "auto sync" && git push
+cd ..
+echo "------------------------------"
+
+
+# ======================================================================
+cd ../../bin
 # ======================================================================
 echo "Commiting woof"
 
