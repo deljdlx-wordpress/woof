@@ -3,7 +3,12 @@
 
 namespace Woof;
 
-use Woof\Model\ORM\Database;
+// use Woof\Model\Database;
+
+use Woof\Model\Wordpress\Database as WordpressDatabase;
+use Woof\Model\Wordpress\PostType;
+use Woof\Model\Wordpress\Taxonomy;
+use Woof\ORM\ORM;
 use Woof\Routing\Route;
 
 
@@ -48,16 +53,16 @@ class Plugin
 
         $this->filepath = $filepath;
 
-        global $wpdb;
-        $this->database = new Database($wpdb);
+        $this->database = WordpressDatabase::getInstance();
+        $this->orm = ORM::getInstance();
 
 
         $this->registerRouter();
 
-        $this->registerCustomPostTypes();
+        $this->registerPostTypes();
         $this->registerPostMetadatas();
 
-        $this->registerCustomTaxonomies();
+        $this->registerTaxonomies();
         $this->registerTaxonomiesMetadata();
 
         $this->registerCustomRoles();
@@ -75,39 +80,60 @@ class Plugin
 
 
     public function registerUserMetadata() {}
-    public function registerCustomPostTypes() {}
+    public function registerPostTypes() {}
     public function registerPostMetadatas() {}
-    public function registerCustomTaxonomies() {}
+    public function registerTaxonomies() {}
     public function registerTaxonomiesMetadata() {}
     public function registerCustomRoles() {}
 
 
     /**
-     * @return Database
+     * @return WordpressDatabase
      */
     public function getDatabase()
     {
         return $this->database;
     }
 
+    /**
+     *
+     * @return Database
+     */
+    public function getORM()
+    {
+        return $this->orm;
+    }
+
 
     //===============================================================================
 
-    protected function registerCustomPostType($name, $label, $class = CustomPostType::class)
+    /**
+     * @param string $name
+     * @param string $label
+     * @param string $class
+     * @return PostType
+     */
+    protected function createPostType($label, $name = null, $class = PostType::class)
     {
-        $customType = new $class($name, $label);
+        $customType = new $class($label, $name);
         $customType->register();
-        $this->customTypes[$name] = $customType;
-
+        $this->customTypes[$customType->getName()] = $customType;
         return $customType;
     }
 
 
-    protected function registerCustomTaxonomy($name, $label, array $postTypes, $class = CustomTaxonomy::class)
+    /**
+     * @param string $label
+     * @param $postTypes
+     * @param string $name
+     * @param string $class
+     * @return Taxonomy
+     */
+    protected function createTaxonomy($label, $postTypes = null, $name = null, $class = Taxonomy::class)
     {
-        $customTaxonomy = new $class($name, $label, $postTypes);
+        $customTaxonomy = new $class($label, $postTypes, $name);
         $customTaxonomy->register();
-        $this->customTaxonomies[$name] = $customTaxonomy;
+        $this->customTaxonomies[$customTaxonomy->getName()] = $customTaxonomy;
         return $customTaxonomy;
     }
 
@@ -152,21 +178,29 @@ class Plugin
     //===============================================================================
 
     /**
-     * @return $this
+     * @return this
      */
     public function registerRouter()
     {
         $this->router = new \Woof\Routing\Router($this);
+        $this->registerRoutes();
         $this->router->register();
         return $this;
     }
 
-
+    /**
+     * @return this
+     */
     public function addRoute($method, $regexWordpress, $patternCustomRouter, $callback, $name = null)
     {
         $route = new Route($method, $regexWordpress, $patternCustomRouter, $callback, $name);
         $this->router->addRoute($route);
         return $this;
+    }
+
+    protected function registerRoutes()
+    {
+
     }
 
     public function getRouter()
@@ -175,7 +209,7 @@ class Plugin
     }
 
     /**
-     * @return $this
+     * @return this
      */
     public function route()
     {
@@ -184,7 +218,7 @@ class Plugin
     }
 
     /**
-     * @return String
+     * @return string
      */
     public function getFilepath()
     {
@@ -193,27 +227,34 @@ class Plugin
 
 
     //===============================================================================
+
+    //===============================================================================
+    public static function createCustomTables()
+    {
+
+    }
+
+
+
+    //===============================================================================
     // méthodes utilitaires
     //===============================================================================
 
     // appelé lorsque le plugin est désactivé
     /**
-     * @return $this
+     * @return this
      */
-    public function deactivate()
+    public static function deactivate()
     {
-        $this->flushRoutes();
-        return $this;
+        static::flushRoutes();
+
     }
 
 
     // appelé lorsque le plugin est activé
-    /**
-     * @return $this
-     */
-    public function activate()
+    public static function activate()
     {
-        return $this;
+        static::createCustomTables();
     }
 
     // appelé lors de la désinstallation du plugin ⚠️ Attention cette méthode doit être statique (obligation wordpress)
@@ -221,31 +262,10 @@ class Plugin
     {
     }
 
-    /**
-     * @return $this
-     */
-    public function flushRoutes()
+    public static function flushRoutes()
     {
         global $wp_rewrite;
         $wp_rewrite->flush_rules();
-        return $this;
-    }
-
-    //===========================================================
-    /**
-     * @return $this
-     */
-    public function register()
-    {
-        // https://developer.wordpress.org/reference/functions/register_activation_hook/
-        // enregistrement du hook qui se déclenche au moment de l'activation du plugin
-        // lorsque le plugin sera activé, wp appelera la méthode activate() de l'objet $plugin (syntaxe "callable")
-
-        register_activation_hook(realpath(__FILE__ . '/..'), [$this, 'activate']);
-        register_deactivation_hook(realpath(__FILE__ . '/..'), [$this, 'deactivate']);
-        register_uninstall_hook(realpath(__FILE__ . '/..'), [static::class, 'uninstall']);
-
-        return $this;
     }
 
 }
