@@ -5,6 +5,7 @@ namespace Woof;
 
 // use Woof\Model\Database;
 
+use Phi\Traits\Introspectable;
 use Woof\Model\Wordpress\Database as WordpressDatabase;
 use Woof\Model\Wordpress\PostType;
 use Woof\Model\Wordpress\Taxonomy;
@@ -14,6 +15,9 @@ use Woof\Routing\Route;
 
 class Plugin
 {
+
+
+    use Introspectable;
 
     protected static $instance;
 
@@ -46,15 +50,26 @@ class Plugin
 
 
     protected $database;
+    protected $orm;
+
+
+    protected $restAPI;
 
 
     public function __construct($filepath)
     {
+        $this->initializeReflector();
 
         $this->filepath = $filepath;
 
         $this->database = WordpressDatabase::getInstance();
         $this->orm = ORM::getInstance();
+
+        $restAPIClassName = $this->getNamespaceName() . '\\RestAPI';
+
+        if(class_exists($restAPIClassName)) {
+            $this->restAPI = new $restAPIClassName($this);
+        }
 
 
         $this->registerRouter();

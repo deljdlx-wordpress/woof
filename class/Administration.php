@@ -11,9 +11,19 @@ class Administration
 
     public function __construct()
     {
-        add_action('admin_menu', function () {
-            $this->registerPages();
-        });
+        $this->addScript(
+            'woof-rest-client',
+            'http://localhost/deploy-wordpress-sample/public/wp-content/plugins/woof/public/assets/javascript/WoofRestClient.js'
+        );
+
+        $this->registerPages();
+        $this->register();
+    }
+
+
+    public function registerPages()
+    {
+
     }
 
     public function addPage($name,  $callback, $slug = null, $parent = false, $capability = 'activate_plugins', $pageTitle = null, $icon = 'dashicons-admin-tools', $order = null)
@@ -26,7 +36,6 @@ class Administration
             $pageTitle = $name . ' - page';
         }
 
-
         $this->entries[$slug] = [
             'pageTitle' => $pageTitle,
             'name' => $name,
@@ -38,41 +47,40 @@ class Administration
         ];
     }
 
-    public function registerPages()
+    public function register()
     {
 
-        foreach($this->entries as $slug => $descriptor) {
+        add_action('admin_menu', function () {
+            foreach($this->entries as $slug => $descriptor) {
 
-            // https://developer.wordpress.org/reference/functions/add_submenu_page/
-            // https://developer.wordpress.org/reference/functions/add_page/
+                // https://developer.wordpress.org/reference/functions/add_submenu_page/
+                // https://developer.wordpress.org/reference/functions/add_page/
 
-            if(!$descriptor['parent']) {
-                add_menu_page(
-                    $descriptor['pageTitle'],
-                    $descriptor['name'],
-                    $descriptor['capability'],
-                    $slug,
-                    $descriptor['callback'],
-                    $descriptor['icon'],
-                    $descriptor['order'],
-                );
+                if(!$descriptor['parent']) {
+                    add_menu_page(
+                        $descriptor['pageTitle'],
+                        $descriptor['name'],
+                        $descriptor['capability'],
+                        $slug,
+                        $descriptor['callback'],
+                        $descriptor['icon'],
+                        $descriptor['order'],
+                    );
+                }
+                else {
+                    add_submenu_page(
+                        $descriptor['parent'],
+                        $descriptor['pageTitle'],
+                        $descriptor['name'],
+                        $descriptor['capability'],
+                        $slug,
+                        $descriptor['callback'],
+                        $descriptor['order']
+                    );
+                }
             }
-            else {
-                add_submenu_page(
-                    $descriptor['parent'],
-                    $descriptor['pageTitle'],
-                    $descriptor['name'],
-                    $descriptor['capability'],
-                    $slug,
-                    $descriptor['callback'],
-                    $descriptor['order']
-                );
-            }
-        }
+        });
     }
-
     //===============================================================================
-
-
 }
 
