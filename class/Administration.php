@@ -2,22 +2,37 @@
 
 namespace Woof;
 
+use Woof\Traits\HasView;
+use Woof\Traits\WordpressPlugin;
+
 class Administration
 {
 
-    use Traits\Displayable;
+    use WordpressPlugin;
+    use HasView;
 
     protected $entries = [];
 
     public function __construct()
     {
+        $this->registerPages();
+        $this->addAssets();
+        $this->register();
+
+
+    }
+
+    public function addAssets()
+    {
+
+        $this->addCSS('wp-jquery-ui-dialog');
+
+        $this->addScript('jquery-ui-dialog');
+
         $this->addScript(
             'woof-rest-client',
-            'http://localhost/deploy-wordpress-sample/public/wp-content/plugins/woof/public/assets/javascript/WoofRestClient.js'
+            $this->getPluginURL('woof') . '/public/assets/javascript/WoofRestClient.js',
         );
-
-        $this->registerPages();
-        $this->register();
     }
 
 
@@ -49,6 +64,7 @@ class Administration
 
     public function register()
     {
+        $this->loadAssets();
 
         add_action('admin_menu', function () {
             foreach($this->entries as $slug => $descriptor) {

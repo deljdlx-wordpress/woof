@@ -76,12 +76,9 @@ class Plugin
 
         $this->registerPostTypes();
         $this->registerPostMetadatas();
-
         $this->registerTaxonomies();
         $this->registerTaxonomiesMetadata();
-
         $this->registerCustomRoles();
-
         $this->registerUserMetadata();
     }
 
