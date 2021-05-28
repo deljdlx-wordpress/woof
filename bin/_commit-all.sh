@@ -2,7 +2,6 @@ commitAllInPath()
 {
     CURRENT_PATH=$(pwd)
 
-
     echo
     cd $1
     for path in *; do

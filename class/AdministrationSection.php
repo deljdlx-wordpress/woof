@@ -5,7 +5,7 @@ namespace Woof;
 use Woof\Traits\HasView;
 use Woof\Traits\WordpressPlugin;
 
-class Administration
+class AdministrationSection
 {
 
     use WordpressPlugin;
