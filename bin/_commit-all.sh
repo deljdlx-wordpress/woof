@@ -8,7 +8,7 @@ commitAllInPath()
     for path in *; do
         echo "🟢 Commiting " $path
         cd $path
-        git add . && git commit -m $MESSAGE && git push
+        git add . && git commit -m "$MESSAGE" && git push
         cd $1
         echo
     done
