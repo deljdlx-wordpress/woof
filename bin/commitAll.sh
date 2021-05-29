@@ -14,10 +14,14 @@ commitAllInPath()
         MESSAGE=$2
     fi
 
+    echo "============================================"
+    echo "🔵Commiting all in $1"
+    echo "============================================"
+
     echo
     cd $1
     for path in *; do
-        echo "🟢 Commiting " $path
+        echo "🟢==== Commiting " $path "====="
         cd $(realpath $path)
         git add . && git commit -m "$MESSAGE" && git push
         cd $1
