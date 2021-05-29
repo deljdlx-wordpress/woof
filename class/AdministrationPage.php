@@ -75,10 +75,10 @@ class AdministrationPage
         return $this;
     }
 
-    public function display()
+    public function display($args = [])
     {
         if($this->template) {
-            $template = $this->loadTemplate( $this->getPluginPath().  $this->template);
+            $template = $this->loadTemplate( $this->getPluginPath().  $this->template, $args);
             echo $template;
         }
     }

@@ -14,25 +14,31 @@ commitAllInPath()
         MESSAGE=$2
     fi
 
+    START_PATH=$(realpath $1)
+
     echo "============================================"
-    echo "🔵Commiting all in $1"
+    echo "🔵Commiting all in " $START_PATH
     echo "============================================"
 
     echo
-    cd $1
+    cd $START_PATH
     for path in *; do
-        echo "🟢==== Commiting " $path "====="
-        cd $(realpath $path)
-        git add . && git commit -m "$MESSAGE" && git push
-        cd $1
-        echo
+        path=$(realpath $path)
+        if [ -d $path ]; then
+            echo "🟢==== Commiting " $path "====="
+            cd $path
+            git add . && git commit -m "$MESSAGE" && git push
+            cd $START_PATH
+            echo
+        else
+            echo "⚠️==== Skipping " $path "====="
+        fi
     done
-    cd $CURRENT_PATH
 }
 
 commitAllInPath $1 $2
 
 
 # exemple
-#    sauvagarder ce code source dans un fichier commitAll.sh (par exmple)
+#   sauvagarder ce code source dans un fichier commitAll.sh (par exmple)
 #   sh commitAll.sh /var/www/html "backup all html folder"
