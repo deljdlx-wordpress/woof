@@ -9,18 +9,37 @@ class AdministrationSection
 {
 
     use WordpressPlugin;
-    use HasView;
+    use HasView {
+        HasView::loadTemplate as traitLoadTemplate;
+    }
+
+
+    protected $plugin;
 
     protected $entries = [];
 
-    public function __construct()
+    public function __construct($plugin)
     {
+        $this->plugin = $plugin;
         $this->registerPages();
         $this->addAssets();
         $this->register();
-
-
     }
+
+    // NOTICE notice override this method in subclasses
+    public function registerPages()
+    {
+    }
+
+
+    public function loadTemplate($path, $args = [])
+    {
+        $template = $this->traitLoadTemplate($path, $args);
+        $template->set('pluginURL', $this->getPluginURL());
+        $template->set('pluginPath', $this->getPluginPath());
+        return $template;
+    }
+
 
     public function addAssets()
     {
@@ -33,12 +52,6 @@ class AdministrationSection
             'woof-rest-client',
             $this->getPluginURL('woof') . '/public/assets/javascript/WoofRestClient.js',
         );
-    }
-
-
-    public function registerPages()
-    {
-
     }
 
     public function addPage($name,  $callback, $slug = null, $parent = false, $capability = 'activate_plugins', $pageTitle = null, $icon = 'dashicons-admin-tools', $order = null)
@@ -62,7 +75,7 @@ class AdministrationSection
         ];
     }
 
-    public function register()
+    protected function register()
     {
         $this->loadAssets();
 

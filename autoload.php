@@ -12,6 +12,8 @@ require_once __DIR__ .'/woof-package/woof/woof-orm/autoload.php';
 require_once __DIR__ .'/woof-package/woof/woof-theme/autoload.php';
 require_once __DIR__ .'/woof-package/woof/woof-view/autoload.php';
 
+require_once __DIR__ .'/woof-package/woof/woof-list-table/autoload.php';
+
 
 require_once(ABSPATH.'wp-admin/includes/user.php');
 

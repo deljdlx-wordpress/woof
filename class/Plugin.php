@@ -55,6 +55,8 @@ class Plugin
 
     protected $restAPI;
 
+    protected $administrationSection;
+
 
     public function __construct($filepath)
     {
@@ -69,6 +71,11 @@ class Plugin
 
         if(class_exists($restAPIClassName)) {
             $this->restAPI = new $restAPIClassName($this);
+        }
+
+        $administrationSectionClassName = $this->getNamespaceName() . '\\AdministrationSection';
+        if(class_exists($administrationSectionClassName)) {
+            $this->administrationSection = new $administrationSectionClassName($this);
         }
 
 
