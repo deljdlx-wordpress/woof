@@ -2,6 +2,7 @@
 
 namespace Woof;
 
+use Woof\Model\Wordpress\Post;
 
 class RestApi
 {
@@ -184,6 +185,18 @@ class RestApi
         else {
             throw new Exception('Post creation failed');
         }
+    }
+
+    public function updatePost($postId, $data)
+    {
+        $post = new Post();
+        $post->loadById($postId);
+        $post->setValues($data);
+
+        $post->save();
+
+        return $post;
+
     }
 
     // ==================================================================================================
