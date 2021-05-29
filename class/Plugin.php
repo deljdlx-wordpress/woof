@@ -11,12 +11,12 @@ use Woof\Model\Wordpress\PostType;
 use Woof\Model\Wordpress\Taxonomy;
 use Woof\ORM\ORM;
 use Woof\Routing\Route;
-
+use Woof\Traits\HasPlugin;
 
 class Plugin
 {
 
-
+    use HasPlugin;
     use Introspectable;
 
     protected static $instance;
@@ -123,6 +123,18 @@ class Plugin
         return $this->orm;
     }
 
+
+
+    //===============================================================================
+    public function getPath($name = null)
+    {
+        return $this->getPluginPath($name);
+    }
+
+    public function getURL($name = null)
+    {
+        return $this->getPluginURL($name);
+    }
 
     //===============================================================================
 

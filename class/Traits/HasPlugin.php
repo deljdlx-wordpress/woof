@@ -3,14 +3,32 @@
 namespace Woof\Traits;
 
 use Phi\Traits\Introspectable;
+use Woof\Plugin;
 
-Trait WordpressPlugin
+Trait HasPlugin
 {
     use Introspectable;
 
+    protected $plugin;
+
+    public function setPlugin($plugin)
+    {
+        $this->plugin = $plugin;
+        return $this;
+    }
+
+    /**
+     *
+     * @return Plugin
+     */
+    public function getPlugin()
+    {
+        return $this->plugin;
+    }
+
     public function getPluginPath($pluginName = null)
     {
-        $path = plugin_dir_path($this->getDefinitionFolder());
+        $path = plugin_dir_path($this->plugin->getDefinitionFolder());
 
         if ($pluginName !== null) {
             $path = dirname($path) . '/' . $pluginName;
@@ -22,7 +40,7 @@ Trait WordpressPlugin
     public function getPluginURL($pluginName = null)
     {
 
-        $url =  plugin_dir_url($this->getDefinitionFolder());
+        $url =  plugin_dir_url($this->plugin->getDefinitionFolder());
 
         if ($pluginName !== null) {
             $url = dirname($url) . '/' . $pluginName;

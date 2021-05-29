@@ -2,28 +2,36 @@
 
 namespace Woof;
 
+use Woof\Traits\HasPlugin;
 use Woof\Traits\HasView;
-use Woof\Traits\WordpressPlugin;
+
 
 class AdministrationSection
 {
 
-    use WordpressPlugin;
     use HasView {
         HasView::loadTemplate as traitLoadTemplate;
     }
+
+    use HasPlugin;
 
 
     protected $plugin;
 
     protected $entries = [];
 
+    protected $pages = [];
+
     public function __construct($plugin)
     {
         $this->plugin = $plugin;
         $this->registerPages();
-        $this->addAssets();
         $this->register();
+    }
+
+    public function getPlugin()
+    {
+        return $this->plugin;
     }
 
     // NOTICE notice override this method in subclasses
@@ -32,84 +40,32 @@ class AdministrationSection
     }
 
 
-    public function loadTemplate($path, $args = [])
+
+    public function getName()
     {
-        $template = $this->traitLoadTemplate($path, $args);
-        $template->set('pluginURL', $this->getPluginURL());
-        $template->set('pluginPath', $this->getPluginPath());
-        return $template;
+        // DOC get_current_screen https://developer.wordpress.org/reference/functions/get_current_screen/
+        $data = get_current_screen();
+
+        return $data->id;
     }
 
 
-    public function addAssets()
+    public function addPage($page)
     {
-
-        $this->addCSS('wp-jquery-ui-dialog');
-
-        $this->addScript('jquery-ui-dialog');
-
-        $this->addScript(
-            'woof-rest-client',
-            $this->getPluginURL('woof') . '/public/assets/javascript/WoofRestClient.js',
-        );
+        $this->pages[] = $page;
     }
 
-    public function addPage($name,  $callback, $slug = null, $parent = false, $capability = 'activate_plugins', $pageTitle = null, $icon = 'dashicons-admin-tools', $order = null)
-    {
-        if($slug === null) {
-            $slug = slugify($name);
-        }
-
-        if($pageTitle === null) {
-            $pageTitle = $name . ' - page';
-        }
-
-        $this->entries[$slug] = [
-            'pageTitle' => $pageTitle,
-            'name' => $name,
-            'capability' => $capability,
-            'callback' => $callback,
-            'icon' => $icon,
-            'order' => $order,
-            'parent' => $parent,
-        ];
-    }
 
     protected function register()
     {
-        $this->loadAssets();
 
         add_action('admin_menu', function () {
-            foreach($this->entries as $slug => $descriptor) {
-
-                // https://developer.wordpress.org/reference/functions/add_submenu_page/
-                // https://developer.wordpress.org/reference/functions/add_page/
-
-                if(!$descriptor['parent']) {
-                    add_menu_page(
-                        $descriptor['pageTitle'],
-                        $descriptor['name'],
-                        $descriptor['capability'],
-                        $slug,
-                        $descriptor['callback'],
-                        $descriptor['icon'],
-                        $descriptor['order'],
-                    );
-                }
-                else {
-                    add_submenu_page(
-                        $descriptor['parent'],
-                        $descriptor['pageTitle'],
-                        $descriptor['name'],
-                        $descriptor['capability'],
-                        $slug,
-                        $descriptor['callback'],
-                        $descriptor['order']
-                    );
-                }
+            foreach($this->pages as $page) {
+                $page->register();
             }
         });
     }
+
     //===============================================================================
 }
 

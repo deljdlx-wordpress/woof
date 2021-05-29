@@ -53,7 +53,7 @@ trait HasView
     }
 
 
-    protected function loadAssets()
+    protected function registerAssets()
     {
         add_action('init', function() {
             foreach($this->assets['javascripts'] as $descriptor) {
