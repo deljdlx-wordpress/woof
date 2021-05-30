@@ -3,6 +3,7 @@
 namespace Woof;
 
 use Woof\Model\Wordpress\Post;
+use WP_REST_Request;
 
 class RestApi
 {
@@ -167,20 +168,25 @@ class RestApi
 
     public function createPost($postType, $data)
     {
-        // $data = $this->getPostData();
 
-        $wordpressData = [
-            // optionnel ; prend le user courant
-            'post_author' => get_current_user_id(),
-            'post_type' => $postType,
-            'post_title' => $data['title'],
-            'post_content' => $data['content'],
-            'post_status' => 'publish',
-        ];
+        $defaultData = [];
+        $defaultData['post_author'] = get_current_user_id();
+        $defaultData['post_type'] = $postType;
+        $defaultData['post_status'] = 'publish';
+        $defaultData['post_content'] = '';
+        $defaultData['post_title'] = 'Untitled';
+        $defaultData['post_excerpt'] = '';
 
-        $postId = wp_insert_post($wordpressData);
-        if(is_int($postId)) {
-            return get_post($postId);
+        $data = array_merge($defaultData, $data);
+
+        $post = new Post();
+        $post->setValues($data);
+        $post->save();
+
+        // $postId = wp_insert_post($wordpressData);
+        if($post->getId()) {
+            return $post;
+            // return get_post($postId);
         }
         else {
             throw new Exception('Post creation failed');
@@ -218,6 +224,18 @@ class RestApi
         else {
             return $_POST;
         }
+    }
+
+    // IMPORTANT nonce rest call validation
+    protected function getUserIdFromNonce(WP_REST_Request $request)
+    {
+        // NOTICE check if _wpnonce was sent in POST/GET paramter
+        // $check = check_ajax_referer( 'wp_rest', '_wpnonce', false );
+
+        $nonce = $request->get_header('X-WP-Nonce');
+        wp_verify_nonce($nonce, 'wp_rest');
+        $currentUserId = get_current_user_id();
+        return $currentUserId;
     }
 
     /*
