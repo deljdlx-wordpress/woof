@@ -46,8 +46,14 @@ class AdministrationPage
         $this->parent = $parent;
 
         $this->addAssets();
-
         $this->registerAssets();
+
+        $this->initialize();
+    }
+
+    public function initialize()
+    {
+
     }
 
     public function setMenuTitle($title)
